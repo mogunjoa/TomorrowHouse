@@ -1,11 +1,10 @@
 package com.mogun.tomorrowhouse.ui.home
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -14,7 +13,6 @@ import com.google.firebase.ktx.Firebase
 import com.mogun.tomorrowhouse.R
 import com.mogun.tomorrowhouse.data.ArticleModel
 import com.mogun.tomorrowhouse.databinding.FragmentHomeBinding
-import com.mogun.tomorrowhouse.ui.article.WriteArticleFragment
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
@@ -24,23 +22,33 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
 
-        val db = Firebase.firestore
-        db.collection("articles").document("DCmHgB62qK94icdYTYOi")
-            .get()
-            .addOnSuccessListener { result ->
-                val article = result.toObject<ArticleModel>()
-                Log.e("homeFragement", article.toString())
+        setupWriteButton(view)
+
+        val articleAdapter = HomeArticleAdapter(
+            onItemClicked = { article ->
+                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToArticleFragment(
+                    articleId = article.articleId.orEmpty()
+                ))
             }
-            .addOnFailureListener {
-                it.printStackTrace()
+        )
+
+        binding.homeRecyclerView.apply {
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = articleAdapter
+        }
+
+        Firebase.firestore.collection("articles").get().addOnSuccessListener { result ->
+            val list = result.map {
+                it.toObject<ArticleModel>()
             }
 
-        setupWriteButton(view)
+            articleAdapter.submitList(list)
+        }
     }
 
     private fun setupWriteButton(view: View) {
         binding.writeButton.setOnClickListener {
-            if(Firebase.auth.currentUser != null) {
+            if (Firebase.auth.currentUser != null) {
                 val action = HomeFragmentDirections.actionHomeFragmentToWriteArticleFragment()
                 findNavController().navigate(action)
             } else {
