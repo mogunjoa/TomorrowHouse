@@ -22,7 +22,7 @@
     <fragment
         android:id="@+id/authFragment"
         android:name="com.mogun.tomorrowhouse.AuthFragment"
-        tools:layout="@layout/fragment_write_article"
+        tools:layout="@layout/fragment_write"
         android:label="AuthFragment" >
     </fragment>
 
@@ -30,5 +30,12 @@
         android:id="@+id/writeArticleFragment"
         android:name="com.mogun.tomorrowhouse.ui.article.WriteArticleFragment"
         android:label="fragment_write_article"
-        tools:layout="@layout/fragment_write_article" />
+        tools:layout="@layout/fragment_write" >
+        <action
+            android:id="@+id/action_writeArticleFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/actionBack"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>
