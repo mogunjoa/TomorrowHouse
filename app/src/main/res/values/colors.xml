@@ -9,9 +9,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray_cc">#CCCCCC</color>
 
-    <color name="light_primary">#6200EE</color>
+    <color name="light_primary">#FFFFFF</color>
     <color name="light_on_primary">#000000</color>
 
-    <color name="dark_primary">#6200EE</color>
+    <color name="dark_primary">#000000</color>
     <color name="dark_on_primary">#FFFFFF</color>
 </resources>

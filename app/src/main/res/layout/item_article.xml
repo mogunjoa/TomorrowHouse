@@ -17,6 +17,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <ImageView
+        android:id="@+id/bookmarkImageButton"
+        app:layout_constraintBottom_toBottomOf="@+id/thumbnailImageView"
+        app:layout_constraintEnd_toEndOf="@+id/thumbnailImageView"
+        android:background="@drawable/baseline_bookmark_border_24"
+        android:layout_margin="5dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"/>
+
     <TextView
         android:id="@+id/descriptionTextView"
         app:layout_constraintStart_toStartOf="parent"

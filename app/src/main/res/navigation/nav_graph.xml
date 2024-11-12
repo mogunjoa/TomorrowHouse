@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_homeFragment_to_articleFragment"
             app:destination="@id/articleFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_bookMarkArticleFragment"
+            app:destination="@id/bookMarkArticleFragment" />
     </fragment>
 
     <fragment
@@ -49,12 +52,23 @@
     <fragment
         android:id="@+id/articleFragment"
         android:name="com.mogun.tomorrowhouse.ui.article.ArticleFragment"
-        android:label="글 상세 {articleId}"
+        android:label="글 상세"
         tools:layout="@layout/fragment_article" >
 
         <argument
             android:name="articleId"
             app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookMarkArticleFragment"
+        android:name="com.mogun.tomorrowhouse.ui.bookmark.BookMarkArticleFragment"
+        android:label="북마크"
+        tools:layout="@layout/fragment_bookmark" >
+
+        <action
+            android:id="@+id/action_bookMarkArticleFragment_to_articleFragment"
+            app:destination="@id/articleFragment" />
     </fragment>
 
 </navigation>
