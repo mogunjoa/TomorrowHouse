@@ -3,10 +3,12 @@ package com.mogun.tomorrowhouse.ui.article
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
@@ -20,14 +22,11 @@ import java.util.UUID
 class WriteArticleFragment : Fragment(R.layout.fragment_write) {
 
     private lateinit var binding: FragmentWriteBinding
-    private var selectedUri: Uri? = null
+    private lateinit var viewModel: WriteArticleViewModel
 
     val pickMedia = registerForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
-            selectedUri = uri
-            binding.photoImageView.setImageURI(uri)
-            binding.plusButton.isVisible = false
-            binding.deleteButton.isVisible = true
+            viewModel.updateSelectedUri(uri)
         }
     }
 
@@ -35,18 +34,51 @@ class WriteArticleFragment : Fragment(R.layout.fragment_write) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentWriteBinding.bind(view)
 
-        startPicker()
+        setupViewModel()
+
+        if(viewModel.selectedUri.value == null) {
+            startPicker()
+        }
+
         setupPhotoImageView()
         setupDelete()
         setupSubmitButton(view)
         setupBackButton()
+        backPressed()
+    }
+
+    private fun backPressed() {
+        requireActivity().onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if(binding.progressBarLayout.isVisible == false) {
+                    findNavController().navigate(WriteArticleFragmentDirections.actionBack())
+                }
+            }
+        })
+    }
+
+    private fun setupViewModel() {
+        viewModel = ViewModelProvider(requireActivity())[WriteArticleViewModel::class.java]
+        viewModel.selectedUri.observe(viewLifecycleOwner) {
+            binding.photoImageView.setImageURI(it)
+            binding.plusButton.isVisible = false
+            binding.deleteButton.isVisible = true
+
+            if (it != null) {
+                binding.deleteButton.isVisible = true
+                binding.plusButton.isVisible = false
+            } else {
+                binding.deleteButton.isVisible = false
+                binding.plusButton.isVisible = true
+            }
+        }
     }
 
     private fun setupSubmitButton(view: View) {
         binding.submitButton.setOnClickListener {
             showProgress()
-            if (selectedUri != null) {
-                val photoUri = selectedUri ?: return@setOnClickListener
+            if (viewModel.selectedUri.value != null) {
+                val photoUri = viewModel.selectedUri.value ?: return@setOnClickListener
                 uploadImage(photoUri,
                     successHandler = { uri ->
                         uploadArticle(uri, binding.descriptionEditText.text.toString())
@@ -66,16 +98,13 @@ class WriteArticleFragment : Fragment(R.layout.fragment_write) {
 
     private fun setupDelete() {
         binding.deleteButton.setOnClickListener {
-            binding.photoImageView.setImageURI(null)
-            selectedUri = null
-            binding.deleteButton.isVisible = false
-            binding.plusButton.isVisible = true
+            viewModel.updateSelectedUri(null)
         }
     }
 
     private fun setupPhotoImageView() {
         binding.photoImageView.setOnClickListener {
-            if (selectedUri == null) {
+            if (viewModel.selectedUri.value == null) {
                 startPicker()
             }
         }
